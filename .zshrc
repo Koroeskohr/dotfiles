@@ -83,7 +83,7 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias marvin-ssh="ssh marvin@marvin-dev.mfglabs.com -R 9014:localhost:9014"
+
 alias gco="git checkout"
 
 function nufeature {
