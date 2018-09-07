@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cp ~/.gitconfig .gitconfig-new
-cp ~/.githelpers .githelpers-new
-cp ~/.zshrc .zshrc-new
-cp ~/.config/nvim/init.vim init-new.vim
+cp ~/.gitconfig .gitconfig
+cp ~/.githelpers .githelpers
+cp ~/.zshrc .zshrc
+cp ~/.config/nvim/init.vim init.vim
