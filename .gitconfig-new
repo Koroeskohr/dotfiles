@@ -14,7 +14,7 @@
 	root-basename = !"git top-level | xargs basename"
 	backup = !"cp -r `git top-level`/.git /tmp/dot-git-backup-$(git root-basename)"
 [core]
-	editor = /usr/bin/vim
+	editor = /usr/local/bin/nvim
 [gui]
 	editor = \"/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl\"
 [push]
