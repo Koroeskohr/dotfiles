@@ -1,3 +1,7 @@
+" Enable python support
+let g:python3_host_prog = '/usr/local/bin/python3.7'
+let g:python2_host_prog = '/usr/local/bin/python'
+
 """""""""""" vim-plug config
 call plug#begin('~/.vim/plugged')
 
@@ -12,9 +16,11 @@ Plug 'ntpeters/vim-better-whitespace' " Not configured
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'airblade/vim-gitgutter' " Not configured
-Plug 'derekwyatt/vim-scala'
-" Plug 'ensime/ensime-vim', { 'do': ':UpdateRemotePlugins' } " Requires nvim with python support
+" Plug 'derekwyatt/vim-scala'
 Plug 'vim-syntastic/syntastic' " Not configured
+Plug 'posva/vim-vue' " Not configured
+Plug 'mxw/vim-jsx' " Not configured
+Plug 'pangloss/vim-javascript' " Not configured
 
 call plug#end()
 
@@ -23,20 +29,19 @@ set background=dark
 colorscheme hybrid_material
 
 """""""""""" Editor config
-set paste
 set number
 set ruler
-set textwidth=120
+set colorcolumn=120
 set cursorline
 set cursorcolumn
 set autochdir
 set mouse=a
+set completeopt=longest,menuone
+set inccommand=nosplit
+set wildmode=longest,list,full
 syntax on
 filetype plugin indent on
 
-" Enable python support
-let g:python3_host_prog = '/usr/local/bin/python3'
-let g:python2_host_prog = '/usr/local/bin/python'
 
 " show existing tab with 2 spaces width
 set tabstop=2
@@ -50,6 +55,20 @@ set expandtab
 
 set autoindent
 
+
+"""""""""""" Custom functions
+function InsertTabWrapper(direction)
+    let col = col('.') - 1
+    if !col || getline('.')[col - 1] !~ '\k'
+        return "\<tab>"
+    elseif "backward" == a:direction
+        return "\<c-p>"
+    else
+        return "\<c-n>"
+    endif
+endfunction
+
+
 """""""""""" Button mapping
 " Set leader
 let mapleader=","
@@ -62,6 +81,9 @@ nnoremap <silent> <C-Down> 10j
 map <leader>q :bp<bar>sp<bar>bn<bar>bd<CR>
 
 map <leader>t :FZF<CR>
+
+inoremap <tab> <c-r>=InsertTabWrapper("forward")<cr>
+inoremap <s-tab> <c-r>=InsertTabWrapper("backward")<cr>
 
 """""""""""" Language specific config
 au BufRead,BufNewFile *.py set expandtab
@@ -77,3 +99,13 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
 let g:airline_theme='violet'
 
+
+"""" Syntastic config
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
