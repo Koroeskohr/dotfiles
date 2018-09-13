@@ -80,6 +80,7 @@ nnoremap <silent> <C-Down> 10j
 " Close buffer, not window
 map <leader>q :bp<bar>sp<bar>bn<bar>bd<CR>
 
+" Fuzzy file search
 map <leader>t :FZF<CR>
 
 inoremap <tab> <c-r>=InsertTabWrapper("forward")<cr>
@@ -87,10 +88,6 @@ inoremap <s-tab> <c-r>=InsertTabWrapper("backward")<cr>
 
 """""""""""" Language specific config
 au BufRead,BufNewFile *.py set expandtab
-
-" autocmd BufWritePost *.scala silent :EnTypeCheck
-" nnoremap <leader>i :EnType<CR>
-" au FileType scala nnoremap <leader>df :EnDeclaration<CR>
 
 "'"""""""""" Plugin specific config
 

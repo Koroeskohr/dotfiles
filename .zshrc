@@ -1,32 +1,7 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
-
 # Path to your oh-my-zsh installation.
 export ZSH=/Users/victor/.oh-my-zsh
 
-# Set name of the theme to load. Optionally, if you set this to "random"
-# it'll load a random theme each time that oh-my-zsh is loaded.
-# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="agnoster"
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion. Case
-# sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
-
-# Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
+ZSH_THEME="robbyrussell"
 
 # Uncomment the following line to enable command auto-correction.
 # ENABLE_CORRECTION="true"
@@ -42,72 +17,153 @@ ZSH_THEME="agnoster"
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(git common-aliases osx sbt sublime wd)
+HIST_STAMPS="dd.mm.yyyy"
 
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
-# export MANPATH="/usr/local/man:$MANPATH"
-
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
+export EDITOR="nvim"
 
 # ssh
 # export SSH_KEY_PATH="~/.ssh/rsa_id"
 
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+# zsh plugins
+plugins=(git common-aliases osx sbt sublime wd)
 
+# Env vars
+
+export PATH="$HOME/.yarn/bin:$PATH"
+export PATH="$HOME/scripts:$PATH"
+export MYZSHRC="$HOME/.zshrc"
+
+# fzf (fuzzy finding)
+export FZF_DEFAULT_COMMAND="ag --nocolor -g """
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_DEFAULT_OPTS="--color fg:242,bg:236,hl:65,fg+:15,bg+:239,hl+:108 --color info:108,prompt:109,spinner:108,pointer:168,marker:168"
+
+export HISTTIMEFORMAT="%d/%m/%y %T "
+
+################ Start services and tools
+
+# Ruby configuration
+eval "$(rbenv init -)"
+
+# NPM/nvm configuration
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Allows tmux -CC
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# Starts z (smart autocomplete)
+. /usr/local/etc/profile.d/z.sh
+
+# Starts fzf (fuzzy-finding)
+if [ -e /usr/local/opt/fzf/shell/completion.zsh ]; then
+  source /usr/local/opt/fzf/shell/key-bindings.zsh
+  source /usr/local/opt/fzf/shell/completion.zsh
+fi
+
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Enable fuck
+eval $(thefuck --alias)
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f "/Users/victor/Downloads/google-cloud-sdk/path.zsh.inc" ]; then source "/Users/victor/Downloads/google-cloud-sdk/path.zsh.inc"; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f "/Users/victor/Downloads/google-cloud-sdk/completion.zsh.inc" ]; then source "/Users/victor/Downloads/google-cloud-sdk/completion.zsh.inc"; fi
+
+################ Aliases and helpers
+alias n="nvim"
+
+alias marvin-ssh="ssh marvin@marvin-dev.mfglabs.com -R 9014:localhost:9014"
 alias gco="git checkout"
+alias xa="exa -abghl --git --color=automatic"
+alias code="/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code"
 
-function nufeature {
-	exists=`git show-ref feature/$1`
-	if [ -n "$exists" ]; then
-	    echo 'Branch exists!'
-	    return 1
-	fi
+alias did="nvim +'normal Go' +'r!date' ~/.did/did.txt"
 
-	if [[ `git status --porcelain` ]]; then
-  	    echo 'Commit or stash changes first !'
-	    return 1
-	fi
-
-	git fetch origin
-	git checkout develop
-
-	if [[ `git status --porcelain` ]]; then
-  	    echo 'develop has changes ????'
-	    return 1
-	fi
-
-	git pull origin develop
-	git checkout -b feature/$1
+function killport {
+  kill -3 $(lsof -i:$1 | grep TCP | awk "{print $2;}")
 }
 
-alias current-git-branch="git show-branch -a 2>/dev/null | grep '\*' | grep -v `git branch-name` | head -n1 | sed 's/.*\[\(.*\)\].*/\1/' | sed 's/[\^~].*//'"
+function swap() {
+  mv $1 $1.swp
+  mv $2 $1
+  mv $1.swp $2
+}
+
+function locof() {
+  z -l $1 | awk "{print $2}" | head -n1
+}
+
+function gcssh() {
+  ssh victor.viale@$(gcloud compute instances list | grep $1 | awk "{print $4}")
+}
+
+function nufeature {
+  exists=$(git show-ref feature/$1)
+  if [ -n "$exists" ]; then
+      echo "Branch $1 already exists!"
+      return 1
+  fi
+
+  if [[ $(git status -uno --porcelain) ]]; then
+    echo "Commit or stash changes first !"
+    return 1
+  fi
+
+  git fetch origin
+  git checkout develop
+
+  if [[ $(git status -uno --porcelain) ]]; then
+    echo "develop has changes, merge/rebase onto dev"
+    return 1
+  fi
+
+  git pull origin develop
+  git checkout -b feature/$1
+}
+
+function endfeature {
+  if [ -z $(git status -uno --porcelain) ]; then
+    branch=$(git rev-parse --abbrev-ref HEAD)
+    if [ $(echo $branch | cut -c 1-8) -ne "feature/" ]
+    then
+      echo "Current branch ($branch) is not a feature"
+      exit 1
+    fi
+    git push origin $branch
+    sleep 1
+    git checkout develop
+    git pull origin develop
+    directory=${PWD##*/}
+    open https://git.mfglabs.com/CFI/oui/compare/develop...$branch
+  else
+    echo "branch is not clean";
+  fi
+}
+
+function initGitHiddenFolder {
+  local git_root=$(git rev-parse --show-toplevel)
+
+  if [ -z $git_root ]
+  then
+    echo "No git repository found for the current directory"
+    exit 1
+  fi
+
+  mkdir -p "$git_root/local"
+  echo "/local" >> $git_root/.git/info/exclude
+}
+
