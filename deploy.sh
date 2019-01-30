@@ -7,4 +7,6 @@ then
 	cp .gitconfig ~/.gitconfig
 	cp .githelpers ~/.githelpers
 	cp .zshrc ~/.zshrc
+  cp .psqlrc ~/.psqlrc
+  cp init.vim ~/.config/nvim/init.vim 
 fi

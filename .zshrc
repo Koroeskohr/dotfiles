@@ -42,7 +42,7 @@ export PATH="$HOME/scripts:$PATH"
 export MYZSHRC="$HOME/.zshrc"
 
 # fzf (fuzzy finding)
-export FZF_DEFAULT_COMMAND="ag --nocolor -g """
+export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--color fg:242,bg:236,hl:65,fg+:15,bg+:239,hl+:108 --color info:108,prompt:109,spinner:108,pointer:168,marker:168"
@@ -86,6 +86,8 @@ if [ -f "/Users/victor/Downloads/google-cloud-sdk/completion.zsh.inc" ]; then so
 ################ Aliases and helpers
 alias n="nvim"
 
+alias ll='ls -lAht'
+
 alias marvin-ssh="ssh marvin@marvin-dev.mfglabs.com -R 9014:localhost:9014"
 alias gco="git checkout"
 alias xa="exa -abghl --git --color=automatic"
@@ -95,6 +97,13 @@ alias did="nvim +'normal Go' +'r!date' ~/.did/did.txt"
 
 function killport {
   kill -3 $(lsof -i:$1 | grep TCP | awk "{print $2;}")
+}
+
+function killgrep {
+  local pids=$(ps aux | grep $1 | grep -v 'grep --color' | awk '{print $2}')
+  while read -r line; do
+    kill -9 "$line"
+  done <<< "$pids"
 }
 
 function swap() {
@@ -108,7 +117,7 @@ function locof() {
 }
 
 function gcssh() {
-  ssh victor.viale@$(gcloud compute instances list | grep $1 | awk "{print $4}")
+  ssh victor.viale@$(gcloud compute instances list | grep $1 | awk '{print $4}' | head -n1)
 }
 
 function nufeature {
@@ -167,3 +176,4 @@ function initGitHiddenFolder {
   echo "/local" >> $git_root/.git/info/exclude
 }
 
+alias run-pg-docker="docker run --name local-postgres -d -p 5432:5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data mdillon/postgis:10"

@@ -16,11 +16,14 @@ Plug 'ntpeters/vim-better-whitespace' " Not configured
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'airblade/vim-gitgutter' " Not configured
-" Plug 'derekwyatt/vim-scala'
-Plug 'vim-syntastic/syntastic' " Not configured
-Plug 'posva/vim-vue' " Not configured
-Plug 'mxw/vim-jsx' " Not configured
-Plug 'pangloss/vim-javascript' " Not configured
+Plug 'derekwyatt/vim-scala'
+Plug 'w0rp/ale' " Not configured
+Plug 'valloric/YouCompleteMe', { 'do': 'python3 ~/.vim/plugged/YouCompleteMe/install.py --rust-completer' }
+Plug 'posva/vim-vue', {'for': 'vue'} " Not configured
+Plug 'mxw/vim-jsx', {'for': 'javascript'} " Not configured
+Plug 'pangloss/vim-javascript', {'for': 'javascript'} " Not configured
+Plug 'junegunn/goyo.vim'
+Plug 'junegunn/limelight.vim'
 
 call plug#end()
 
@@ -34,11 +37,15 @@ set ruler
 set colorcolumn=120
 set cursorline
 set cursorcolumn
-set autochdir
+set scrolloff=5
+"set autochdir
 set mouse=a
 set completeopt=longest,menuone
 set inccommand=nosplit
 set wildmode=longest,list,full
+set nocompatible
+set title
+set showcmd
 syntax on
 filetype plugin indent on
 
@@ -88,6 +95,8 @@ inoremap <s-tab> <c-r>=InsertTabWrapper("backward")<cr>
 
 """""""""""" Language specific config
 au BufRead,BufNewFile *.py set expandtab
+autocmd BufRead,BufNewFile *.md :set linebreak
+autocmd BufRead,BufNewFile *.md :Goyo
 
 "'"""""""""" Plugin specific config
 
@@ -96,13 +105,9 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
 let g:airline_theme='violet'
 
+"""" ALE (linter)
+let g:airline#extensions#ale#enabled = 1
 
-"""" Syntastic config
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
+"""" Limelight
+let g:limelight_conceal_ctermfg = 'gray'
+let g:limelight_conceal_ctermfg = 240
