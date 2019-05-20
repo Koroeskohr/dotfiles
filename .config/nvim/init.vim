@@ -1,6 +1,6 @@
 " Enable python support
-let g:python3_host_prog = '/usr/local/bin/python3.7'
-let g:python2_host_prog = '/usr/local/bin/python'
+let g:python3_host_prog = '/usr/local/bin/python3'
+let g:python2_host_prog = '/usr/local/bin/python2'
 
 """""""""""" vim-plug config
 call plug#begin('~/.vim/plugged')
@@ -18,7 +18,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'airblade/vim-gitgutter' " Not configured
 Plug 'derekwyatt/vim-scala'
 Plug 'w0rp/ale' " Not configured
-Plug 'valloric/YouCompleteMe', { 'do': 'python3 ~/.vim/plugged/YouCompleteMe/install.py --rust-completer' }
+Plug 'valloric/YouCompleteMe', { 'do': 'if command -v rust cmake; then python3 ~/.vim/plugged/YouCompleteMe/install.py --rust-completer --ts-completer; else echo \"CMake or Rust is missing\"; exit 1; fi' }
 Plug 'posva/vim-vue', {'for': 'vue'} " Not configured
 Plug 'mxw/vim-jsx', {'for': 'javascript'} " Not configured
 Plug 'pangloss/vim-javascript', {'for': 'javascript'} " Not configured
@@ -62,27 +62,18 @@ set expandtab
 
 set autoindent
 
-
-"""""""""""" Custom functions
-function InsertTabWrapper(direction)
-    let col = col('.') - 1
-    if !col || getline('.')[col - 1] !~ '\k'
-        return "\<tab>"
-    elseif "backward" == a:direction
-        return "\<c-p>"
-    else
-        return "\<c-n>"
-    endif
-endfunction
-
-
 """""""""""" Button mapping
 " Set leader
 let mapleader=","
 
 " Faster scrolling
+nnoremap <silent> <C-k> 10k
+nnoremap <silent> <C-j> 10j
 nnoremap <silent> <C-Up> 10k
 nnoremap <silent> <C-Down> 10j
+
+nmap <silent> <leader>h <C-w>h
+nmap <silent> <leader>l <C-w>l
 
 " Close buffer, not window
 map <leader>q :bp<bar>sp<bar>bn<bar>bd<CR>
@@ -90,13 +81,13 @@ map <leader>q :bp<bar>sp<bar>bn<bar>bd<CR>
 " Fuzzy file search
 map <leader>t :FZF<CR>
 
-inoremap <tab> <c-r>=InsertTabWrapper("forward")<cr>
-inoremap <s-tab> <c-r>=InsertTabWrapper("backward")<cr>
+nmap <silent> <C-b> :NERDTreeToggle<CR>
+
+command CDC echo %:p:h | cd %:p:h
 
 """""""""""" Language specific config
-au BufRead,BufNewFile *.py set expandtab
-autocmd BufRead,BufNewFile *.md :set linebreak
-autocmd BufRead,BufNewFile *.md :Goyo
+autocmd BufRead,BufNewFile *.py set expandtab
+autocmd BufRead,BufNewFile *.md set linebreak
 
 "'"""""""""" Plugin specific config
 
@@ -111,3 +102,4 @@ let g:airline#extensions#ale#enabled = 1
 """" Limelight
 let g:limelight_conceal_ctermfg = 'gray'
 let g:limelight_conceal_ctermfg = 240
+

@@ -1,0 +1,3 @@
+function jupyter-scala-start () {
+  (cd /Users/victorviale/DubiousFoolery/scala-scripts && ../jupyter-scala/jupyter-scala.sh)
+}

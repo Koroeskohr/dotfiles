@@ -1,13 +1,10 @@
+export WORK_DIR="PreciseArchery"
+export PERSONAL_DIR="DubiousFoolery"
+
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/victor/.oh-my-zsh
+export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_THEME="robbyrussell"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
@@ -41,6 +38,8 @@ export PATH="$HOME/.yarn/bin:$PATH"
 export PATH="$HOME/scripts:$PATH"
 export MYZSHRC="$HOME/.zshrc"
 
+source ~/.functions
+
 # fzf (fuzzy finding)
 export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
@@ -52,15 +51,18 @@ export HISTTIMEFORMAT="%d/%m/%y %T "
 ################ Start services and tools
 
 # Ruby configuration
-eval "$(rbenv init -)"
+# eval "$(rbenv init -)"
 
 # NPM/nvm configuration
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# Allows tmux -CC
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # Allows tmux -CC
+  test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+fi
+
 
 # Starts z (smart autocomplete)
 . /usr/local/etc/profile.d/z.sh
@@ -74,24 +76,40 @@ fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# Enable fuck
-eval $(thefuck --alias)
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f "/Users/victor/Downloads/google-cloud-sdk/path.zsh.inc" ]; then source "/Users/victor/Downloads/google-cloud-sdk/path.zsh.inc"; fi
+# Kubernetes kubectl completion
+source <(kubectl completion zsh)
 
-# The next line enables shell command completion for gcloud.
-if [ -f "/Users/victor/Downloads/google-cloud-sdk/completion.zsh.inc" ]; then source "/Users/victor/Downloads/google-cloud-sdk/completion.zsh.inc"; fi
+function pod-name () {
+  kubectl get pods | grep $1 | awk '{ print $1 }'
+}
 
+function pod-logs() {
+  kubectl logs $2 $(pod-name "$1")
+}
+
+function pod-kill () {
+  kubectl delete pod $(pod-name "$1")
+}
+
+function pod-sh () {
+  kubectl exec -it $(pod-name "$1") /bin/sh
+}
 ################ Aliases and helpers
 alias n="nvim"
 
 alias ll='ls -lAht'
 
-alias marvin-ssh="ssh marvin@marvin-dev.mfglabs.com -R 9014:localhost:9014"
+alias g="git"
 alias gco="git checkout"
 alias xa="exa -abghl --git --color=automatic"
-alias code="/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code"
+
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    alias code="/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code"
+else
+    alias code="/usr/bin/code"
+fi
 
 alias did="nvim +'normal Go' +'r!date' ~/.did/did.txt"
 
@@ -114,10 +132,6 @@ function swap() {
 
 function locof() {
   z -l $1 | awk "{print $2}" | head -n1
-}
-
-function gcssh() {
-  ssh victor.viale@$(gcloud compute instances list | grep $1 | awk '{print $4}' | head -n1)
 }
 
 function nufeature {
@@ -157,13 +171,12 @@ function endfeature {
     git checkout develop
     git pull origin develop
     directory=${PWD##*/}
-    open https://git.mfglabs.com/CFI/oui/compare/develop...$branch
   else
     echo "branch is not clean";
   fi
 }
 
-function initGitHiddenFolder {
+function init_git_hidden_folder {
   local git_root=$(git rev-parse --show-toplevel)
 
   if [ -z $git_root ]
@@ -176,4 +189,3 @@ function initGitHiddenFolder {
   echo "/local" >> $git_root/.git/info/exclude
 }
 
-alias run-pg-docker="docker run --name local-postgres -d -p 5432:5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data mdillon/postgis:10"
