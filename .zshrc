@@ -1,5 +1,5 @@
-export WORK_DIR="PreciseArchery"
-export PERSONAL_DIR="DubiousFoolery"
+export WORK_DIR="$HOME/PreciseArchery"
+export PERSONAL_DIR="$HOME/DubiousFoolery"
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -35,6 +35,7 @@ plugins=(git common-aliases osx sbt sublime wd)
 # Env vars
 
 export PATH="$HOME/.yarn/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="$HOME/scripts:$PATH"
 export MYZSHRC="$HOME/.zshrc"
 
@@ -51,7 +52,9 @@ export HISTTIMEFORMAT="%d/%m/%y %T "
 ################ Start services and tools
 
 # Ruby configuration
-# eval "$(rbenv init -)"
+export PATH="$HOME/.rbenv/bin:$PATH"
+export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
+eval "$(rbenv init -)"
 
 # NPM/nvm configuration
 export NVM_DIR="$HOME/.nvm"
@@ -63,9 +66,12 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 fi
 
+if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
+  source /etc/profile.d/vte.sh
+fi
 
 # Starts z (smart autocomplete)
-. /usr/local/etc/profile.d/z.sh
+. /etc/profile.d/z.sh
 
 # Starts fzf (fuzzy-finding)
 if [ -e /usr/local/opt/fzf/shell/completion.zsh ]; then
@@ -95,6 +101,9 @@ function pod-kill () {
 function pod-sh () {
   kubectl exec -it $(pod-name "$1") /bin/sh
 }
+
+alias kp='kubectl get pods'
+
 ################ Aliases and helpers
 alias n="nvim"
 

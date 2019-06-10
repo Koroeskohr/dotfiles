@@ -1,8 +1,13 @@
 " Enable python support
-let g:python3_host_prog = '/usr/local/bin/python3'
-let g:python2_host_prog = '/usr/local/bin/python2'
+let g:python3_host_prog = '/usr/bin/python3.7'
+let g:python2_host_prog = '/usr/bin/python2'
 
 """""""""""" vim-plug config
+if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
+  silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 call plug#begin('~/.vim/plugged')
 
 Plug 'junegunn/vim-easy-align' " Not configured
@@ -22,6 +27,7 @@ Plug 'valloric/YouCompleteMe', { 'do': 'if command -v rust cmake; then python3 ~
 Plug 'posva/vim-vue', {'for': 'vue'} " Not configured
 Plug 'mxw/vim-jsx', {'for': 'javascript'} " Not configured
 Plug 'pangloss/vim-javascript', {'for': 'javascript'} " Not configured
+Plug 'leafgarland/typescript-vim'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/limelight.vim'
 
@@ -83,7 +89,15 @@ map <leader>t :FZF<CR>
 
 nmap <silent> <C-b> :NERDTreeToggle<CR>
 
+" cd to current file's directory
 command CDC echo %:p:h | cd %:p:h
+
+"""" vim-easy-align
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
 
 """""""""""" Language specific config
 autocmd BufRead,BufNewFile *.py set expandtab
@@ -92,9 +106,9 @@ autocmd BufRead,BufNewFile *.md set linebreak
 "'"""""""""" Plugin specific config
 
 """" Vim-airline
-let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#enabled  = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
-let g:airline_theme='violet'
+let g:airline_theme                       = 'violet'
 
 """" ALE (linter)
 let g:airline#extensions#ale#enabled = 1
