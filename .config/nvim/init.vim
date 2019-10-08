@@ -52,9 +52,13 @@ set wildmode=longest,list,full
 set nocompatible
 set title
 set showcmd
+set undofile
+set lazyredraw
+set smartcase
+set ignorecase
+set foldcolumn=1
 syntax on
 filetype plugin indent on
-
 
 " show existing tab with 2 spaces width
 set tabstop=2
@@ -83,6 +87,8 @@ nmap <silent> <leader>l <C-w>l
 
 " Close buffer, not window
 map <leader>q :bp<bar>sp<bar>bn<bar>bd<CR>
+nnoremap <Leader>c :bp<CR>
+nnoremap <Leader>v :bn<CR>
 
 " Fuzzy file search
 map <leader>t :FZF<CR>
@@ -90,7 +96,9 @@ map <leader>t :FZF<CR>
 nmap <silent> <C-b> :NERDTreeToggle<CR>
 
 " cd to current file's directory
-command CDC echo %:p:h | cd %:p:h
+if !exists(':CDC')
+  command CDC echo %:p:h | cd %:p:h
+endif
 
 """" vim-easy-align
 " Start interactive EasyAlign in visual mode (e.g. vipga)

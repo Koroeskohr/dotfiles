@@ -6,6 +6,13 @@ export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_THEME="robbyrussell"
 
+fpath=(~/.config/completions $fpath)
+
+
+command_exists () {
+	command -v "$1"
+}
+
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
 # much, much faster.
@@ -26,20 +33,25 @@ source $ZSH/oh-my-zsh.sh
 # Preferred editor for local and remote sessions
 export EDITOR="nvim"
 
+# Every command longer than n seconds will display exec time
+export REPORTTIME=5
+
 # ssh
 # export SSH_KEY_PATH="~/.ssh/rsa_id"
 
 # zsh plugins
-plugins=(git common-aliases osx sbt sublime wd)
+plugins=(git common-aliases osx sbt sublime wd zsh-better-npm-completion)
 
 # Env vars
 
 export PATH="$HOME/.yarn/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="$HOME/scripts:$PATH"
+export PATH="$HOME/.bloop:$PATH"
 export MYZSHRC="$HOME/.zshrc"
 
 source ~/.functions
+source ~/.creds
 
 # fzf (fuzzy finding)
 export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
@@ -54,7 +66,7 @@ export HISTTIMEFORMAT="%d/%m/%y %T "
 # Ruby configuration
 export PATH="$HOME/.rbenv/bin:$PATH"
 export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
-eval "$(rbenv init -)"
+command_exists rbenv && eval "$(rbenv init -)"
 
 # NPM/nvm configuration
 export NVM_DIR="$HOME/.nvm"
@@ -79,12 +91,11 @@ if [ -e /usr/local/opt/fzf/shell/completion.zsh ]; then
   source /usr/local/opt/fzf/shell/completion.zsh
 fi
 
-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 
 # Kubernetes kubectl completion
-source <(kubectl completion zsh)
+command_exists kubectl && source <(kubectl completion zsh)
 
 function pod-name () {
   kubectl get pods | grep $1 | awk '{ print $1 }'
@@ -111,8 +122,8 @@ alias ll='ls -lAht'
 
 alias g="git"
 alias gco="git checkout"
+alias gst='git status'
 alias xa="exa -abghl --git --color=automatic"
-
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     alias code="/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code"
@@ -196,5 +207,10 @@ function init_git_hidden_folder {
 
   mkdir -p "$git_root/local"
   echo "/local" >> $git_root/.git/info/exclude
+}
+
+function fbranch () {
+  local branch=$(jira-cli get "$1" | jq '.fields.summary' | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/"//g')
+  git checkout -b "IMP-$1-$branch"
 }
 
