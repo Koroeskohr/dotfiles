@@ -10,7 +10,7 @@ fpath=(~/.config/completions $fpath)
 
 
 command_exists () {
-	command -v "$1"
+	command -v "$1" >/dev/null
 }
 
 # Uncomment the following line if you want to disable marking untracked files
