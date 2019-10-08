@@ -51,7 +51,7 @@ export PATH="$HOME/.bloop:$PATH"
 export MYZSHRC="$HOME/.zshrc"
 
 source ~/.functions
-source ~/.creds
+source ~/.*.inc.sh
 
 # fzf (fuzzy finding)
 export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
