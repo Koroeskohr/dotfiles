@@ -1,0 +1,68 @@
+\set ON_ERROR_ROLLBACK interactive
+\set COMP_KEYWORD_CASE upper
+\set HISTCONTROL ignoredups
+
+-- Show null value as '(null)' instead of blanks
+\pset null '(null)'
+
+-- Show query time
+\timing on
+
+-- Format each record as a set of rows when there are too many columns too fit the screen
+\x auto
+
+-- One histfile per DB
+\set HISTFILE ~/.psql_history- :DBNAME
+
+SELECT :'DBNAME' || :'HOST' ILIKE '%prod%' AS is_prod,
+       :'DBNAME' || :'HOST' ILIKE '%staging%' AS is_recette
+\gset
+\if :is_prod
+  \set color '%[%033[31m%]'
+\elif :is_recette
+  \set color '%[%033[38;5;10m%]'
+\else
+  \set color '%[%033[38;5;4m%]'
+\endif
+
+\set PROMPT1 '%[%033[1m%]%M%[%033[1m%] ' :color '%n%[%033[1;37m%] @ %[%033[1;34m%]%/%[%033[0m%] (' :env ') %#%R%x '
+
+\unset is_prod
+\unset is_recette
+\unset color
+
+------------------
+-- UTILITY METHODS
+------------------
+\set activity 'select * from pg_stat_activity;'
+\set connections 'select usename, count(*) from pg_stat_activity group by usename;'
+\set settings 'select name, setting, context from pg_settings;'
+
+\set sizes 'select table_schema as table_schema, table_name as table_name, pg_size_pretty(pg_total_relation_size(table_schema||\'.\'||table_name)) as total_size_pretty, pg_size_pretty(pg_relation_size(table_schema||\'.\'||table_name)) as table_size_pretty, pg_size_pretty(pg_total_relation_size(table_schema||\'.\'||table_name) - pg_relation_size(table_schema||\'.\'||table_name)) as index_size_pretty, case when pg_relation_size(table_schema||\'.\'||table_name) <> 0 then round( (pg_total_relation_size(table_schema||\'.\'||table_name) - pg_relation_size(table_schema||\'.\'||table_name))::numeric / pg_relation_size(table_schema||\'.\'||table_name)::numeric , 3) else null end as index_over_table_ratio, case when (pg_total_relation_size(table_schema||\'.\'||table_name) - pg_relation_size(table_schema||\'.\'||table_name)) <> 0 then round( pg_relation_size(table_schema||\'.\'||table_name)::numeric / (pg_total_relation_size(table_schema||\'.\'||table_name) - pg_relation_size(table_schema||\'.\'||table_name))::numeric , 3) else null end as table_over_index_ratio, pg_total_relation_size(table_schema||\'.\'||table_name) as total_size, pg_relation_size(table_schema||\'.\'||table_name) as table_size, (pg_total_relation_size(table_schema||\'.\'||table_name) - pg_relation_size(table_schema||\'.\'||table_name)) as index_size from information_schema.tables where table_schema <> \'pg_catalog\' and table_schema <> \'information_schema\' order by index_size desc;'
+\set idxsize 'SELECT pg_size_pretty(pg_relation_size(schemaname||\'.\'||relname)), * FROM pg_stat_all_indexes where idx_scan = 0 and schemaname <> \'pg_toast\' order by pg_relation_size(schemaname||\'.\'||relname) desc;'
+\set extensions 'select * from pg_available_extensions;'
+\set locks  'SELECT bl.pid AS blocked_pid, a.usename AS blocked_user, kl.pid AS blocking_pid, ka.usename AS blocking_user, a.query AS blocked_statement FROM pg_catalog.pg_locks bl JOIN pg_catalog.pg_stat_activity a ON bl.pid = a.pid JOIN pg_catalog.pg_locks kl JOIN pg_catalog.pg_stat_activity ka ON kl.pid = ka.pid ON bl.transactionid = kl.transactionid AND bl.pid != kl.pid WHERE NOT bl.granted;'
+  \set waits 'SELECT pg_stat_activity.pid, pg_stat_activity.query, pg_stat_activity.waiting, now() - pg_stat_activity.query_start AS \"totaltime\", pg_stat_activity.backend_start FROM pg_stat_activity WHERE pg_stat_activity.query !~ \'%IDLE%\'::text AND pg_stat_activity.waiting = true;'
+  \set dbsize 'SELECT datname, pg_size_pretty(pg_database_size(datname)) db_size FROM pg_database ORDER BY pg_database_size(datname);'
+  \set tablesize 'SELECT nspname, relname AS \"relation\", pg_size_pretty(pg_relation_size(C.oid)) AS "size" FROM pg_class C LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace) WHERE nspname NOT IN (\'pg_catalog\', \'information_schema\') ORDER BY pg_relation_size(C.oid) DESC LIMIT 40;'
+  \set vacuum_prog     'SELECT * FROM pg_stat_progress_vacuum;'
+
+-------------------
+-- STARTUP MESSAGES
+-------------------
+\set VERBOSITY verbose
+\set QUIET OFF
+
+\echo ''
+\echo '\t:activity\t-- List running queries.'
+\echo '\t:connections\t-- List open connections.'
+\echo '\t:settings\t-- List runtime configuration.'
+\echo '\t:locks\t\t-- Lock info.'
+\echo '\t:tablesize\t-- Table disk usage.'
+\echo '\t:vacuum_prog\t-- Show latest vacuum''s progress'
+\echo '\t:extensions\t-- List available extensions.'
+\echo '\t:waits\t\t-- Waiting queries.'
+\echo '\t:dbsize\t\t-- Database disk usage.'
+\echo '\t:idxsize\t-- Index disk and query usage.'
+\echo '\t:sizes\t\t-- Table and index disk usage.'
+\echo ''

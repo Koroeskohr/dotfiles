@@ -1,0 +1,41 @@
+[cola]
+	spellcheck = false
+	startupmode = list
+[user]
+	name = Victor Viale
+	email = {{ .email | quote }}
+
+[alias]
+	lg1 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+	lg2 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all
+	lg = !git lg1
+	branch-name = rev-parse --abbrev-ref HEAD
+	list-commits = !source ~/.githelpers && git log $(current-git-branch)..$(git rev-parse --abbrev-ref HEAD)
+	top-level = rev-parse --show-toplevel
+	root-basename = !git top-level | xargs basename
+	backup = !cp -r $(git top-level)/.git /tmp/dot-git-backup-$(git root-basename) && echo "/tmp/dot-git-backup-$(git root-basename)"
+	undo = reset --soft HEAD^
+[core]
+	editor = {{ .editorPath | quote }}
+[gui]
+	editor = code
+	diffcontext = 17
+[push]
+  default = current
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[filesystem "Oracle Corporation|11.0.2|/dev/mapper/ubuntu--vg-root"]
+	timestampResolution = 10000 nanoseconds
+	minRacyThreshold = 6767 microseconds
+[filesystem "Private Build|1.8.0_232|/dev/mapper/ubuntu--vg-root"]
+	timestampResolution = 1001 microseconds
+	minRacyThreshold = 5782 microseconds
+[fetch]
+	prune = true
+[diff]
+	external = difft
+[init]
+	defaultBranch = main

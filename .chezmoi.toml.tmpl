@@ -1,0 +1,8 @@
+{{- $email := promptStringOnce . "email" "Email address -"}}
+{{- $editorPath := promptStringOnce . "editorPath" "Path to $EDITOR" }}
+{{- $isWork := promptBoolOnce . "isWork" "Is that a work computer" }}
+
+[data]
+  email = {{ $email | quote }}
+  editorPath = {{ $editorPath | quote }}
+  isWork = {{ $isWork }}

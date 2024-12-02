@@ -1,3 +1,0 @@
-function jupyter-scala-start () {
-  (cd ~/$PERSONAL_DIR/scala-scripts && ../jupyter-scala/jupyter-scala.sh)
-}
